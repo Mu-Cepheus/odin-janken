@@ -19,11 +19,18 @@ function getHumanChoice() {
     // tempted to while loop and use nullish coalescer
     // but I have a feeling they'll ask for that later
     // apparently they just tell you not to bother and to make something more appealing instead
-    let humanChoice = prompt("Rock, paper, or scissors?");
+    let humanChoice;
+    while (!(['rock', 'paper', 'scissors'].includes(humanChoice))) {
+        humanChoice = prompt("Rock, paper, or scissors?");
+        if (humanChoice === null) {
+            continue;
+        }
+        humanChoice = humanChoice.toLowerCase();
+    }
     return humanChoice;
 }
 
-function playRound(humanChoice, computerChoice) {
+function playRound(humanChoice = getHumanChoice(), computerChoice = getComputerChoice()) {
     // I guarantee you there is a less janky way to do this
     switch (humanChoice) {
         case "rock":
@@ -72,30 +79,40 @@ function playRound(humanChoice, computerChoice) {
     }
 }
 
-function playGame() {
-    let humanScore = 0;
-    let computerScore = 0;
-    let computerChoice, humanChoice, result;
-    for (let i = 0; i < 5; i++) {
-        computerChoice = getComputerChoice();
-        humanChoice = getHumanChoice().toLowerCase();
-        result = playRound(humanChoice, computerChoice);
-        switch (result){
-            case "win":
-                humanScore+=1;
-                break;
-            case "lose":
-                computerScore+=1;
-                break;
-            default:
-                break;
-        }
+let playerScore = 0, computerScore = 0;
+function handleRPS(event) {
+    let target = event.target;
+    let result;
+    switch (target.id) {
+        case 'btnRock':
+            result = playRound('rock');
+            break;
+        case 'btnPaper':
+            result = playRound('paper');
+            break;
+        case 'btnScissors':
+            result = playRound('scissors');
+            break;
     }
-    if (humanScore > computerScore) {
-        console.log(`U win`);
-    } else if (humanScore < computerScore) {
-        console.log(`U lose`);
-    } else {
-        console.log(`Draw`);
+    if (result === 'win') {
+        playerScore += 1;
+    } else if (result === 'lose') {
+        computerScore += 1;
+    }
+    const display = document.querySelector("#results");
+    display.textContent=`Player: ${playerScore}, COM: ${computerScore}`;
+    if (playerScore===5){
+        alert("You wins");
+        playerScore=0;
+        computerScore=0;
+        display.textContent=`Player: 0, COM: 0`;
+    } else if(computerScore===5){
+        alert("You loss");
+        playerScore=0;
+        computerScore=0;
+        display.textContent=`Player: 0, COM: 0`;
     }
 }
+
+const buttonsRPS = document.querySelector("#janken-buttons");
+buttonsRPS.addEventListener("click", handleRPS);
